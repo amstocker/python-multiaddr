@@ -4,13 +4,18 @@ from .exceptions import AddressException, ProtocolException
 
 
 
+def raise_invalid(string):
+    try:
+        msg = "Invalid address: {}".format(string)
+    except:
+        msg = "Invalid address"
+    raise AddressException(msg)
+
+
+
 class MultiAddrBuffer(bytearray):
 
-    _format_size = { 16: '!H',
-                     32: '!I',
-                    128: '!QQ'}
-
-    @static_method
+    @staticmethod
     def from_tuples(tuples):
         addr = MultiAddrBuffer()
         for part in tuples:
@@ -22,48 +27,58 @@ class MultiAddrBuffer(bytearray):
 
 
     def add(self, part):
-        proto   = protocols.get_from_name(part[0])
-        ip_long = long_from_string(part[1])
         
-        self.extend(struct.pack('!B', proto.code))
-        self.extend(struct.pack(_format_size[proto.size], ip_long))
+        proto = part[0]
 
+        if proto.name == protocols.IP4:
+            addr = conversion.ip4_string_to_bytes(part[1])
+        elif proto.name == protocols.IP6:
+            addr = conversion.ip6_string_to_bytes(part[1])
+        elif proto.name == protocols.TCP:
+            addr = conversion.port_to_bytes(part[1])
+        elif proto.name == protocols.UDP:
+            addr = conversion.port_to_bytes(part[1])
+        else:
+            msg = "Protocol not implemented: {}".format(proto.name)
+            raise AddressException(msg)
 
+        self.extend(conversion.proto_to_bytes(proto.code))
+        self.extend(addr)
 
-
-
-def raise_invalid(string):
-    try:
-        msg = "Invalid address: {}".format(string)
-    except:
-        msg = "Invalid address"
-    raise AddressException(msg)
-
-
-
-def validate_addr(string):
-    pass
 
 
 def string_to_tuples(string):
+    """
+    Converts a multiaddr string into a list of tuples corresponding to each
+    address part.
+    """
     parts = string.split('/')[1:]
-
+    
     # parts list should be even length
-    if not len(parts) % 2:
+    if len(parts) % 2:
         raise_invalid(string)
 
     tuples = []
 
     for i in range(0, len(parts), 2):
         # check if valid
-        protocols.get_by_name(part[i])
+        proto = protocols.get_by_name(parts[i])
         
-        tuples.append((parts[i], parts[i+1]))
-
+        tuples.append((proto, parts[i+1]))
+    
     return tuples
 
 
-def tuples_to_bytes(string):
-    tuples = string_to_tuples(string)
+def tuples_to_bytes(tuples):
+    """
+    Converts a list of tuples corresponding to the parts of a MultiAddress into
+    a bytes object.
+    """
     return MultiAddrBuffer.from_tuples(tuples).to_bytes()
 
+
+def parse_addr(string):
+    """
+    Returns the binary format of a MultiAddress.
+    """
+    return tuples_to_bytes(string_to_tuples(string))

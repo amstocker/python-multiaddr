@@ -1,59 +1,55 @@
+from collections import namedtuple
 
 from .exceptions import ProtocolException
 
 
 
-class Protocol(object):
-    
-    def __init__(self, name, code, size):
-        self._name = name
-        self._code = code
-        self._size = size
+# Definitions of protocol names, codes, and address sizes--respectively.
 
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def code(self):
-        return self._code
-
-    @property
-    def size(self):
-        return self._size
-
-
+IP4  = 'ip4'
+TCP  = 'tcp'
+UDP  = 'udp'
+DCCP = 'dccp'
+IP6  = 'ip6'
+SCTP = 'sctp'
 
 __protocol_names = {
-         'ip4' : Protocol( 'ip4',   4,  32),
-         'tcp' : Protocol( 'tcp',   6,  16),
-         'udp' : Protocol( 'udp',  17,  16),
-        'dccp' : Protocol('dccp',  33,  16),
-         'ip6' : Protocol( 'ip6',  41, 128),
-        'sctp' : Protocol('sctp', 132,  16)
+         IP4 : (  IP4,   4,  32),
+         TCP : (  TCP,   6,  16),
+         UDP : (  UDP,  17,  16),
+        DCCP : ( DCCP,  33,  16),
+         IP6 : (  IP6,  41, 128),
+        SCTP : ( SCTP, 132,  16)
         }
 
-__protocol_codes = dict([(p.code, p) for p in __protocol_names.values()])
+__protocol_codes = dict([(p[1], p) for p in __protocol_names.values()])
 
+
+
+Protocol = namedtuple('Protocol', ('name', 'code', 'size'))
 
 
 def get_by_code(code):
     try:
-        return __protocol_codes[int(code)]
+        args = __protocol_codes[int(code)]
     except:
         try:
             msg = "Invalid protocol code: {}".format(code)
         except:
             msg = "Invalid protocol code"
         raise ProtocolError(msg)
+    else:
+        return Protocol(*args)
 
 
 def get_by_name(name):
     try:
-        return __protocol_names[str(name)]
+        args =  __protocol_names[str(name)]
     except:
         try:
             msg = "Invalid protocol name: {}".format(name)
         except:
             msg = "Invalid protocol name"
         raise ProtocolError(msg)
+    else:
+        return Protocol(*args)
