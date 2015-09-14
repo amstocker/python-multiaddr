@@ -1,6 +1,8 @@
 from socket import AF_INET6, inet_aton, inet_ntoa, inet_ntop, inet_pton
 import struct
 
+from . import protocols
+
 
 
  ########
@@ -101,3 +103,41 @@ def proto_from_bytes(code):
     Converts a protocol code from a bytes oject to an int.
     """
     return struct.unpack('!B', code)[0]
+
+
+
+def to_bytes(proto, string):
+    """
+    Properly converts address string or port to bytes based on given protocol.
+    """
+    if proto.name == protocols.IP4:
+        addr = ip4_string_to_bytes(string)
+    elif proto.name == protocols.IP6:
+        addr = ip6_string_to_bytes(string)
+    elif proto.name == protocols.TCP:
+        addr = port_to_bytes(string)
+    elif proto.name == protocols.UDP:
+        addr = port_to_bytes(string)
+    else:
+        msg = "Protocol not implemented: {}".format(proto.name)
+        raise AddressException(msg)
+    return addr
+
+
+def to_string(proto, addr):
+    """
+    Properly converts bytes to string or int representation based on the given
+    protocol.
+    """
+    if proto.name == protocols.IP4:
+        string = ip4_bytes_to_string(addr)
+    elif proto.name == protocols.IP6:
+        string = ip6_bytes_to_string(addr)
+    elif proto.name == protocols.TCP:
+        string = port_from_bytes(addr)
+    elif proto.name == protocols.UDP:
+        string = port_from_bytes(addr)
+    else:
+        msg = "Protocol not implemented: {}".format(proto.name)
+        raise AddressException(msg)
+    return string

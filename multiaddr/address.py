@@ -5,8 +5,17 @@ from . import parse
 class MultiAddress(object):
     
     def __init__(self, address):
-        self.address = address
-        self._bytes = parse.parse_addr(address)
+        str_repr, byte_repr = parse.parse_addr(address)
+        
+        self.str_repr = str_repr
+        self.byte_repr = byte_repr
+
 
     def __repr__(self):
-        return "<{}:{}>".format(self.__class__, self.address)
+        return "<multiaddr:{}>".format(self.str_repr)
+
+    def as_bytes(self):
+        """
+        Returns the binary format as an immutable bytes object.
+        """
+        return bytes(self.byte_repr)

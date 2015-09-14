@@ -44,7 +44,7 @@ def get_by_code(code):
 
 def get_by_name(name):
     try:
-        args =  __protocol_names[str(name)]
+        args =  __protocol_names[str(name).lower()]
     except:
         try:
             msg = "Invalid protocol name: {}".format(name)
