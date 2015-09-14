@@ -59,10 +59,15 @@ def bytes_to_tuples(addr):
     while i < len(addr):
         code = conversion.proto_from_bytes(addr[i])
         proto = protocols.get_by_code(code)
-        string = conversion.to_string(proto, addr[i+1:i+1+(proto.size//8)])
+        if proto.size > 0:
+            size = proto.size//8
+            string = conversion.to_string(proto, addr[i+1:i+1+size])
+        elif proto.name == protocols.IPFS:
+            varint, size = conversion.decode_uvarint(addr[i+1:])
+            string = conversion.b58encode(varint)
         tuples.append((proto, string))
 
-        i += 1+(proto.size//8)
+        i += 1+size
 
     return tuples
 

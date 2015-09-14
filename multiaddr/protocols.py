@@ -12,6 +12,7 @@ UDP  = 'udp'
 DCCP = 'dccp'
 IP6  = 'ip6'
 SCTP = 'sctp'
+IPFS = 'ipfs'
 
 __protocol_names = {
          IP4 : (  IP4,   4,  32),
@@ -19,7 +20,8 @@ __protocol_names = {
          UDP : (  UDP,  17,  16),
         DCCP : ( DCCP,  33,  16),
          IP6 : (  IP6,  41, 128),
-        SCTP : ( SCTP, 132,  16)
+        SCTP : ( SCTP, 132,  16),
+        IPFS : ( IPFS,  21,  -1)    # IPFS hashes are varint encoded
         }
 
 __protocol_codes = dict([(p[1], p) for p in __protocol_names.values()])

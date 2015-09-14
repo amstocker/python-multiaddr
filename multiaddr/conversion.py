@@ -74,7 +74,7 @@ def ip6_bytes_to_string(ip6):
 
 
  ########
- # MISC #
+ # Misc #
  ########
 
 def port_to_bytes(port):
@@ -106,6 +106,86 @@ def proto_from_bytes(code):
 
 
 
+ ###############################
+ # MultiHash Encoding/Decoding #
+ ###############################
+
+B58_ALPHABET = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
+
+        
+def b58encode(num):
+    """
+    Returns num in a base58-encoded string.
+    """
+    encode = ''
+    
+    if (num < 0):
+        return ''
+    
+    while (num >= 58):  
+        mod = num % 58
+        encode = B58_ALPHABET[mod] + encode
+        num = num / 58
+    if (num):
+        encode = B58_ALPHABET[num] + encode
+
+    return encode
+
+
+def b58decode(s):
+    """
+    Decodes the base58-encoded string s into an integer.
+    """
+    decoded = 0
+    multi = 1
+    s = s[::-1]
+    for char in s:
+        decoded += multi * B58_ALPHABET.index(char)
+        multi = multi * 58
+        
+    return decoded
+
+
+# ref: https://developers.google.com/protocol-buffers/docs/encoding?hl=en
+def encode_uvarint(value):
+    buf = bytearray()
+    bits = value & 0x7f
+    value >>= 7
+    while value:
+        buf.append(chr(0x80|bits))
+        bits = value & 0x7f
+        value >>= 7
+    buf.append(chr(bits))
+    return bytes(buf)
+
+
+def decode_uvarint(buf):
+    pos = result = shift = 0
+    while True:
+        b = ord(buf[pos])
+        result |= ((b & 0x7f) << shift)
+        pos += 1
+        if not (b & 0x80):
+            return result, pos
+        shift += 7
+
+
+def multihash_to_bytes(string):
+    """
+    Converts a multihash string as an unsigned varint.
+    """
+    return encode_uvarint(b58decode(string))
+
+
+def multihash_to_string(mhash):
+    """
+    Converts a uvarint encoded multihash into a string.
+    """
+    return b58encode(decode_uvarint(mhash)[0])
+
+
+
+
 def to_bytes(proto, string):
     """
     Properly converts address string or port to bytes based on given protocol.
@@ -118,6 +198,8 @@ def to_bytes(proto, string):
         addr = port_to_bytes(string)
     elif proto.name == protocols.UDP:
         addr = port_to_bytes(string)
+    elif proto.name == protocols.IPFS:
+        addr = multihash_to_bytes(string)
     else:
         msg = "Protocol not implemented: {}".format(proto.name)
         raise AddressException(msg)
@@ -137,6 +219,8 @@ def to_string(proto, addr):
         string = port_from_bytes(addr)
     elif proto.name == protocols.UDP:
         string = port_from_bytes(addr)
+    elif proto.name == protocols.IPFS:
+        string = multihash_to_string(addr)
     else:
         msg = "Protocol not implemented: {}".format(proto.name)
         raise AddressException(msg)
