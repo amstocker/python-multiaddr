@@ -50,7 +50,8 @@ def tuples_to_bytes(tuples):
 
 def bytes_to_tuples(addr):
     """
-    Converts the binary format of a multiaddr into its string representation.
+    Converts the binary format of a multiaddr into a list of tuples
+    corresponding to each part of the multiaddr.
     """
     tuples = []
 
@@ -68,7 +69,7 @@ def bytes_to_tuples(addr):
 
 def tuples_to_string(tuples):
     """
-    Converts a list of tuples into string representation.
+    Converts a list of tuples into multiaddr string representation.
     """
     return '/' + '/'.join(['/'.join((t[0].name, str(t[1]))) for t in tuples])
 
