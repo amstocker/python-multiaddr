@@ -13,7 +13,7 @@ def ip4_string_to_bytes(string):
     """
     Converts an ip4 address from string representation to a bytes object.
     """
-    return bytes(inet_aton(string))
+    return inet_aton(string)
 
 
 def ip4_bytes_to_long(ip4):
@@ -27,7 +27,7 @@ def ip4_long_to_bytes(ip4):
     """
     Converts an ip4 address from long representation to a bytes object.
     """
-    return bytes(struct.pack('!L', ip4))
+    return struct.pack('!L', ip4)
 
 
 def ip4_bytes_to_string(ip4):
@@ -46,7 +46,7 @@ def ip6_string_to_bytes(string):
     """
     Converts an ip6 address from string representation to a bytes object.
     """
-    return bytes(inet_pton(AF_INET6, string))
+    return inet_pton(AF_INET6, string)
 
 
 def ip6_bytes_to_long(ip6):
@@ -62,7 +62,7 @@ def ip6_long_to_bytes(ip6):
     Converts an ip6 address from 16 byte long representation to a bytes object.
     """
     a, b = ip6 >> 64, ip6 % (2<<64)
-    return bytes(struct.pack('!QQ', a, b))
+    return struct.pack('!QQ', a, b)
 
 
 def ip6_bytes_to_string(ip6):
@@ -81,7 +81,7 @@ def port_to_bytes(port):
     """
     Converts a port number to an unsigned short.
     """
-    return bytes(struct.pack('!H', int(port)))
+    return struct.pack('!H', int(port))
 
 
 def port_from_bytes(port):
@@ -95,7 +95,7 @@ def proto_to_bytes(code):
     """
     Converts a protocol code into an unsigned char.
     """
-    return bytes(struct.pack('!B', int(code)))
+    return struct.pack('!B', int(code))
 
 
 def proto_from_bytes(code):
