@@ -118,17 +118,14 @@ def b58encode(num):
     Returns num in a base58-encoded string.
     """
     encode = ''
-    
     if (num < 0):
         return ''
-    
     while (num >= 58):  
         mod = num % 58
         encode = B58_ALPHABET[mod] + encode
         num = num / 58
     if (num):
         encode = B58_ALPHABET[num] + encode
-
     return encode
 
 
@@ -142,11 +139,10 @@ def b58decode(s):
     for char in s:
         decoded += multi * B58_ALPHABET.index(char)
         multi = multi * 58
-        
     return decoded
 
 
-# ref: https://developers.google.com/protocol-buffers/docs/encoding?hl=en
+# ref:  https://developers.google.com/protocol-buffers/docs/encoding?hl=en
 def encode_uvarint(value):
     buf = bytearray()
     bits = value & 0x7f
