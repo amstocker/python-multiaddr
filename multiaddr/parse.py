@@ -13,26 +13,6 @@ def raise_invalid(string):
 
 
 
-class MultiAddrBuffer(bytearray):
-
-    @staticmethod
-    def from_tuples(tuples):
-        addr = MultiAddrBuffer()
-        for part in tuples:
-            addr.add(part)
-        return addr
-    
-    def to_bytes(self):
-        return bytes(self)
-
-    def add(self, part):
-        proto = part[0]
-        addr = conversion.to_bytes(proto, part[1])
-        self.extend(conversion.proto_to_bytes(proto.code))
-        self.extend(addr)
-
-
-
 def string_to_tuples(string):
     """
     Converts a multiaddr string into a list of tuples corresponding to each
@@ -58,7 +38,14 @@ def tuples_to_bytes(tuples):
     Converts a list of tuples corresponding to the parts of a MultiAddress into
     a bytes object.
     """
-    return MultiAddrBuffer.from_tuples(tuples)
+    b = bytearray()
+
+    for part in tuples:
+        proto = part[0]
+        b.extend(conversion.proto_to_bytes(proto.code))
+        b.extend(conversion.to_bytes(proto, part[1]))
+
+    return bytes(b)
 
 
 def bytes_to_tuples(addr):
