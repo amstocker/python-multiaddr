@@ -156,13 +156,13 @@ def encode_uvarint(value):
 
 
 def decode_uvarint(buf):
-    pos = result = shift = 0
+    size = result = shift = 0
     while True:
-        b = ord(buf[pos])
+        b = ord(buf[size])
         result |= ((b & 0x7f) << shift)
-        pos += 1
+        size += 1
         if not (b & 0x80):
-            return result, pos
+            return result, size
         shift += 7
 
 
