@@ -95,14 +95,14 @@ def proto_to_bytes(code):
     """
     Converts a protocol code into an unsigned char.
     """
-    return struct.pack('!B', int(code))
+    return encode_uvarint(code)
 
 
 def proto_from_bytes(code):
     """
     Converts a protocol code from a bytes oject to an int.
     """
-    return struct.unpack('!B', code)[0]
+    return decode_uvarint(code)[0]
 
 
 
@@ -205,19 +205,25 @@ def to_bytes(proto, string):
 def to_string(proto, addr):
     """
     Properly converts bytes to string or int representation based on the given
-    protocol.
+    protocol.  Returns string representation of address and the number of bytes
+    from the buffer consumed.
     """
     if proto.name == protocols.IP4:
-        string = ip4_bytes_to_string(addr)
+        size = proto.size//8
+        string = ip4_bytes_to_string(addr[:size])
     elif proto.name == protocols.IP6:
-        string = ip6_bytes_to_string(addr)
+        size = proto.size//8
+        string = ip6_bytes_to_string(addr[:size])
     elif proto.name == protocols.TCP:
-        string = port_from_bytes(addr)
+        size = proto.size//8
+        string = port_from_bytes(addr[:size])
     elif proto.name == protocols.UDP:
-        string = port_from_bytes(addr)
+        size = proto.size//8
+        string = port_from_bytes(addr[:size])
     elif proto.name == protocols.IPFS:
-        string = multihash_to_string(addr)
+        varint, size = decode_uvarint(addr)
+        string = b58encode(varint)
     else:
         msg = "Protocol not implemented: {}".format(proto.name)
         raise AddressException(msg)
-    return string
+    return string, size

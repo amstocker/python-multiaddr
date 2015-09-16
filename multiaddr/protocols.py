@@ -39,7 +39,7 @@ def get_by_code(code):
             msg = "Invalid protocol code: {}".format(code)
         except:
             msg = "Invalid protocol code"
-        raise ProtocolError(msg)
+        raise ProtocolException(msg)
     else:
         return Protocol(*args)
 
@@ -52,6 +52,6 @@ def get_by_name(name):
             msg = "Invalid protocol name: {}".format(name)
         except:
             msg = "Invalid protocol name"
-        raise ProtocolError(msg)
+        raise ProtocolException(msg)
     else:
         return Protocol(*args)
