@@ -4,10 +4,10 @@ Conversions between python types and bytes objects.
 from socket import AF_INET6, inet_aton, inet_ntoa, inet_ntop, inet_pton
 import struct
 
-from ipfstools.multiaddr import protocols
-from ipfstools.multiaddr.exceptions import AddressException
-from ipfstools.utils.base58 import b58encode, b58decode
-from ipfstools.utils.varint import uvarint_encode, uvarint_decode
+from multiaddr import protocols
+from multiaddr.exceptions import AddressException
+from multiaddr.utils.base58 import b58encode, b58decode
+from multiaddr.utils.varint import uvarint_encode, uvarint_decode
 
 
  ########

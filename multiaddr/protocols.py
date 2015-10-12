@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from ipfstools.multiaddr.exceptions import ProtocolException
+from multiaddr.exceptions import ProtocolException
 
 
 

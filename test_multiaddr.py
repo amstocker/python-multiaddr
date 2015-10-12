@@ -1,4 +1,4 @@
-from ipfstools.multiaddr import MultiAddress
+from multiaddr import MultiAddress
 
 ma = MultiAddress("/ip4/127.0.0.1/tcp/4001/ipfs/QmerTTan8gkTEugcb4DmFpAw8Z7bkDQfhoGh6AHzQaqD1Y")
 

@@ -1,4 +1,4 @@
-from ipfstools.multiaddr import parse
+from multiaddr import parse
 
 
 class MultiAddress(object):
