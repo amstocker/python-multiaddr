@@ -1,6 +1,9 @@
-from . import protocols
-from . import conversion
-from .exceptions import AddressException, ProtocolException
+"""
+MultiAddress string and byte parsing.
+"""
+from ipfstools.multiaddr import protocols, conversion
+from ipfstools.multiaddr.exceptions import AddressException
+from ipfstools.multiaddr.exceptions import ProtocolException
 
 
 
@@ -40,10 +43,9 @@ def tuples_to_bytes(tuples):
     """
     b = bytearray()
 
-    for part in tuples:
-        proto = part[0]
+    for proto, addr in tuples:
         b.extend(conversion.proto_to_bytes(proto.code))
-        b.extend(conversion.to_bytes(proto, part[1]))
+        b.extend(conversion.to_bytes(proto, addr))
 
     return bytes(b)
 

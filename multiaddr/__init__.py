@@ -1,1 +1,1 @@
-from address import *
+from ipfstools.multiaddr.address import *

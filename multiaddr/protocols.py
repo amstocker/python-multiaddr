@@ -1,27 +1,28 @@
 from collections import namedtuple
 
-from .exceptions import ProtocolException
+from ipfstools.multiaddr.exceptions import ProtocolException
 
 
 
 # Definitions of protocol names, codes, and address sizes--respectively.
 
-IP4  = 'ip4'
-TCP  = 'tcp'
-UDP  = 'udp'
+IP4  =  'ip4'
+TCP  =  'tcp'
+UDP  =  'udp'
 DCCP = 'dccp'
-IP6  = 'ip6'
+IP6  =  'ip6'
 SCTP = 'sctp'
 IPFS = 'ipfs'
 
+
 __protocol_names = {
-         IP4 : (  IP4,   4,  32),
-         TCP : (  TCP,   6,  16),
-         UDP : (  UDP,  17,  16),
-        DCCP : ( DCCP,  33,  16),
-         IP6 : (  IP6,  41, 128),
-        SCTP : ( SCTP, 132,  16),
-        IPFS : ( IPFS,  21,  -1)    # IPFS hashes are varint encoded
+            IP4  : (  IP4,   4,  32),
+            TCP  : (  TCP,   6,  16),
+            UDP  : (  UDP,  17,  16),
+            DCCP : ( DCCP,  33,  16),
+            IP6  : (  IP6,  41, 128),
+            SCTP : ( SCTP, 132,  16),
+            IPFS : ( IPFS,  21,  -1)   # IPFS hashes are varint encoded
         }
 
 __protocol_codes = dict([(p[1], p) for p in __protocol_names.values()])

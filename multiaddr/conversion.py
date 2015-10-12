@@ -1,8 +1,13 @@
+"""
+Conversions between python types and bytes objects.
+"""
 from socket import AF_INET6, inet_aton, inet_ntoa, inet_ntop, inet_pton
 import struct
 
-from . import protocols
-
+from ipfstools.multiaddr import protocols
+from ipfstools.multiaddr.exceptions import AddressException
+from ipfstools.utils.base58 import b58encode, b58decode
+from ipfstools.utils.varint import uvarint_encode, uvarint_decode
 
 
  ########
@@ -35,7 +40,6 @@ def ip4_bytes_to_string(ip4):
     Converts an ip4 address from long representation to a string.
     """
     return inet_ntoa(ip4)
-
 
 
  ########
@@ -93,92 +97,31 @@ def port_from_bytes(port):
 
 def proto_to_bytes(code):
     """
-    Converts a protocol code into an unsigned char.
+    Converts a protocol code into an unsigned varint.
     """
-    return encode_uvarint(code)
+    return uvarint_encode(code)[0]
 
 
 def proto_from_bytes(code):
     """
     Converts a protocol code from a bytes oject to an int.
     """
-    return decode_uvarint(code)[0]
+    return uvarint_decode(code)[0]
 
-
-
- ###############################
- # MultiHash Encoding/Decoding #
- ###############################
-
-B58_ALPHABET = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
-
-        
-def b58encode(num):
-    """
-    Returns num in a base58-encoded string.
-    """
-    encode = ''
-    if (num < 0):
-        return ''
-    while (num >= 58):  
-        mod = num % 58
-        encode = B58_ALPHABET[mod] + encode
-        num = num / 58
-    if (num):
-        encode = B58_ALPHABET[num] + encode
-    return encode
-
-
-def b58decode(s):
-    """
-    Decodes the base58-encoded string s into an integer.
-    """
-    decoded = 0
-    multi = 1
-    s = s[::-1]
-    for char in s:
-        decoded += multi * B58_ALPHABET.index(char)
-        multi = multi * 58
-    return decoded
-
-
-# ref:  https://developers.google.com/protocol-buffers/docs/encoding?hl=en
-def encode_uvarint(value):
-    buf = bytearray()
-    bits = value & 0x7f
-    value >>= 7
-    while value:
-        buf.append(chr(0x80|bits))
-        bits = value & 0x7f
-        value >>= 7
-    buf.append(chr(bits))
-    return bytes(buf)
-
-
-def decode_uvarint(buf):
-    size = result = shift = 0
-    while True:
-        b = ord(buf[size])
-        result |= ((b & 0x7f) << shift)
-        size += 1
-        if not (b & 0x80):
-            return result, size
-        shift += 7
 
 
 def multihash_to_bytes(string):
     """
     Converts a multihash string as an unsigned varint.
     """
-    return encode_uvarint(b58decode(string))
+    return uvarint_encode(b58decode(string))[0]
 
 
 def multihash_to_string(mhash):
     """
     Converts a uvarint encoded multihash into a string.
     """
-    return b58encode(decode_uvarint(mhash)[0])
-
+    return b58encode(uvarint_decode(mhash)[0])
 
 
 
@@ -221,7 +164,7 @@ def to_string(proto, addr):
         size = proto.size//8
         string = port_from_bytes(addr[:size])
     elif proto.name == protocols.IPFS:
-        varint, size = decode_uvarint(addr)
+        varint, size = uvarint_decode(addr)
         string = b58encode(varint)
     else:
         msg = "Protocol not implemented: {}".format(proto.name)
